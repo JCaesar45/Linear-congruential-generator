@@ -1,0 +1,9 @@
+# .gitignore
+__pycache__/
+*.py[cod]
+node_modules/
+dist/
+*.class
+target/
+.idea/
+.vscode/
