@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LCG Engine | Precision Pseudo-Random Generation</title>
+    <style>
+      :root {
+        --bg-primary: #0a0a0c;
+        --bg-secondary: #121216;
+        --accent-gold: #d4af37;
+        --accent-platinum: #e5e4e2;
+        --text-primary: #f8f9fa;
+        --text-secondary: #a0a0a5;
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.08);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .bg-gradient {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background:
+          radial-gradient(
+            circle at 20% 80%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(229, 228, 226, 0.05) 0%,
+            transparent 50%
+          );
+        z-index: 0;
+      }
+      .container {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 600px;
+        padding: 2rem;
+      }
+      .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 3rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        animation: fadeIn 1s ease-out;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      h1 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        letter-spacing: -0.05em;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(
+          135deg,
+          var(--accent-platinum),
+          var(--accent-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .subtitle {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 2.5rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .input-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      .input-field {
+        display: flex;
+        flex-direction: column;
+      }
+      label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      input {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 1rem;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+      input:focus {
+        outline: none;
+        border-color: var(--accent-gold);
+        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+      }
+      .btn-generate {
+        width: 100%;
+        padding: 1.2rem;
+        background: linear-gradient(135deg, var(--accent-gold), #b8962e);
+        border: none;
+        border-radius: 12px;
+        color: #000;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+      }
+      .btn-generate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(212, 175, 55, 0.3);
+      }
+      .result-display {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid var(--glass-border);
+        display: none;
+      }
+      .result-display.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+      }
+      .result-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+      }
+      .result-value {
+        font-size: 2rem;
+        font-weight: 300;
+        color: var(--accent-gold);
+        font-variant-numeric: tabular-nums;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-gradient"></div>
+    <div class="container">
+      <div class="glass-card">
+        <h1>LCG Engine</h1>
+        <p class="subtitle">Precision Pseudo-Random Generation</p>
+        <form id="lcgForm">
+          <div class="input-group">
+            <div class="input-field">
+              <label for="r0">Seed (r0)</label>
+              <input type="number" id="r0" value="324" required />
+            </div>
+            <div class="input-field">
+              <label for="a">Multiplier (a)</label>
+              <input type="number" id="a" value="1145" required />
+            </div>
+            <div class="input-field">
+              <label for="c">Increment (c)</label>
+              <input type="number" id="c" value="177" required />
+            </div>
+            <div class="input-field">
+              <label for="m">Modulus (m)</label>
+              <input type="number" id="m" value="2148" required />
+            </div>
+            <div class="input-field">
+              <label for="n">Iterations (n)</label>
+              <input type="number" id="n" value="3" required />
+            </div>
+          </div>
+          <button type="submit" class="btn-generate">Execute Generation</button>
+        </form>
+        <div id="result" class="result-display">
+          <div class="result-label">Generated Value (rn)</div>
+          <div id="resultValue" class="result-value">0</div>
+        </div>
+      </div>
+    </div>
+    <script>
+      function linearCongGenerator(r0, a, c, m, n) {
+        let r = r0;
+        for (let i = 0; i < n; i++) {
+          r = (a * r + c) % m;
+        }
+        return r;
+      }
+
+      document
+        .getElementById("lcgForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const r0 = parseInt(document.getElementById("r0").value);
+          const a = parseInt(document.getElementById("a").value);
+          const c = parseInt(document.getElementById("c").value);
+          const m = parseInt(document.getElementById("m").value);
+          const n = parseInt(document.getElementById("n").value);
+
+          const result = linearCongGenerator(r0, a, c, m, n);
+
+          const resultDisplay = document.getElementById("result");
+          const resultValue = document.getElementById("resultValue");
+
+          resultValue.textContent = result;
+          resultDisplay.classList.add("active");
+        });
+    </script>
+  </body>
+</html>
