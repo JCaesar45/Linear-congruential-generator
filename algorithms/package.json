@@ -1,0 +1,13 @@
+{
+  "name": "lcg-algorithms",
+  "version": "1.0.0",
+  "description": "Linear Congruential Generator implementations",
+  "main": "lcg.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node lcg.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}
